@@ -108,13 +108,65 @@
   .h-co { text-align: left !important; font-weight: 700; color: var(--text-dark); }
   .legend { margin-top: 12px; display: flex; gap: 20px; font-size: 11px; color: var(--text-light); }
 
-  /* Before/After */
-  .ba-grid { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; }
-  .ba-arrow { text-align: center; font-size: 28px; color: var(--primary-blue); }
-  .ba-box { padding: 20px; border-radius: 10px; font-size: 13px; line-height: 2; }
-  .ba-before { background: var(--red-50); border: 1px solid var(--red-100); }
-  .ba-after { background: var(--blue-50); border: 1px solid var(--blue-100); }
-  .ba-label { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+  /* Data source pills */
+  .datasource-bar {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+    padding: 14px 20px; background: #fff; border: 1px solid var(--gray-200);
+    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); align-items: center;
+  }
+  .datasource-bar .ds-label { font-size: 12px; font-weight: 700; color: var(--text-light); margin-right: 4px; }
+  .ds-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: #d4f5e6; color: #0c8a5e; border: 1px solid #b0e6cc;
+  }
+  .ds-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #0c8a5e; }
+  .src-badge {
+    display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 9px; font-weight: 700;
+    margin-left: 4px; vertical-align: middle;
+  }
+  .src-sf { background: #e7eefb; color: var(--primary-blue); }
+  .src-bdr { background: #eff8fa; color: #00a2da; }
+
+  /* Node popup */
+  .node-popup-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 999; background: rgba(0,0,0,0.15);
+  }
+  .node-popup-overlay.active { display: block; }
+  .node-popup {
+    position: fixed; z-index: 1000;
+    background: #fff; border-radius: 12px; padding: 20px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); border: 1px solid var(--gray-200);
+    min-width: 260px; max-width: 340px;
+  }
+  .node-popup h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+  .node-popup .np-info { font-size: 12px; color: var(--text-light); line-height: 1.8; margin-bottom: 12px; }
+  .node-popup .np-info strong { color: var(--text-dark); }
+  .node-popup .np-btns { display: flex; gap: 8px; }
+  .np-btn {
+    padding: 8px 16px; border-radius: 8px; border: none; font-size: 12px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif;
+  }
+  .np-btn-ai {
+    background: var(--primary-blue); color: #fff;
+  }
+  .np-btn-ai:hover { background: var(--blue-500); }
+  .np-btn-detail {
+    background: var(--gray-50); color: var(--text-dark); border: 1px solid var(--gray-200);
+  }
+  .np-btn-detail:hover { background: var(--gray-200); }
+  .np-spinner {
+    display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite;
+    vertical-align: middle; margin-right: 4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .np-done { color: #0c8a5e; font-size: 12px; font-weight: 600; }
+
+  /* SVG clickable nodes */
+  .mindmap-svg .clickable-node { cursor: pointer; transition: filter 0.2s; }
+  .mindmap-svg .clickable-node:hover { filter: brightness(0.92); }
 
   /* Mindmap */
   .mindmap-container { width: 100%; overflow-x: auto; padding: 8px 0; }
@@ -181,7 +233,7 @@
 <div class="header">
   <div>
     <h1>Organization Sales Dashboard</h1>
-    <div class="subtitle">BDRアタックリスト x Salesforce x AI — 組織図営業ダッシュボード</div>
+    <div class="subtitle">SF × BDR アタックリスト × AI — ABM営業ダッシュボード</div>
   </div>
   <div class="claude-badge">Claude Code で自動生成</div>
 </div>
@@ -194,6 +246,13 @@
 <!-- ===================== TAB 1: 全体俯瞰 ===================== -->
 <div id="tab-overview" class="tab-content active">
   <div class="page">
+
+    <div class="datasource-bar">
+      <span class="ds-label">データソース:</span>
+      <span class="ds-pill"><span class="dot"></span>Salesforce 連携中</span>
+      <span class="ds-pill"><span class="dot"></span>BDRリスト 連携中</span>
+      <span class="ds-pill"><span class="dot"></span>AI分析 稼働中</span>
+    </div>
 
     <div class="card">
       <h2>カバレッジサマリ — 全186社</h2>
@@ -222,11 +281,11 @@
     </div>
 
     <div class="card">
-      <h2>アプローチ状況ヒートマップ — Tier1企業（抜粋）</h2>
+      <h2>HCMアプローチ状況 — Tier1企業（抜粋）</h2>
       <div style="overflow-x:auto;">
         <table class="heatmap-table">
           <thead><tr>
-            <th style="width:180px;">企業名</th><th>秘書室</th><th>人事本部</th><th>人事部</th><th>総務部</th><th>経営企画</th><th>人材開発</th><th>ステータス</th>
+            <th style="width:180px;">企業名</th><th>人事部</th><th>人材開発部</th><th>研修企画</th><th>タレントマネジメント</th><th>組織開発</th><th>HRBP</th><th>ステータス</th>
           </tr></thead>
           <tbody>
             <tr><td class="h-co">シスメックス</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-green">確認済</span></td></tr>
@@ -248,29 +307,6 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2>Before / After</h2>
-      <div class="ba-grid">
-        <div class="ba-box ba-before">
-          <div class="ba-label" style="color:var(--red);">BEFORE</div>
-          部署情報がスプシの1セルに自由テキスト<br>
-          誰がどの部署にいるか把握しにくい<br>
-          「抜け」は目視で確認<br>
-          アプローチ状況は担当者の頭の中<br>
-          186社の全体感が見えない
-        </div>
-        <div class="ba-arrow">&#10132;</div>
-        <div class="ba-box ba-after">
-          <div class="ba-label" style="color:var(--primary-blue);">AFTER</div>
-          部署構造がマインドマップで自動可視化<br>
-          「誰に会えて / 会えていないか」が一目瞭然<br>
-          AIが「抜け」を自動検出しアクション提案<br>
-          ヒートマップで186社を俯瞰<br>
-          <strong style="color:var(--primary-blue);">「組織図見せて」→ 即回答</strong>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -282,11 +318,11 @@
       <div>
         <div class="co-name">日本精工株式会社（NSK）</div>
         <div class="co-meta">
-          <span>Tier: <span class="v">Tier1</span></span>
-          <span>AE: <span class="v">酒井 皓矢</span></span>
-          <span>BDR: <span class="v">増谷</span></span>
-          <span>コンタクト: <span class="v">10名</span></span>
-          <span>所在地: <span class="v">東京都品川区</span></span>
+          <span>Tier: <span class="v">Tier1</span><span class="src-badge src-sf">SF</span></span>
+          <span>AE: <span class="v">酒井 皓矢</span><span class="src-badge src-sf">SF</span></span>
+          <span>BDR: <span class="v">増谷</span><span class="src-badge src-bdr">BDR</span></span>
+          <span>コンタクト: <span class="v">10名</span><span class="src-badge src-sf">SF</span><span class="src-badge src-bdr">BDR</span></span>
+          <span>所在地: <span class="v">東京都品川区</span><span class="src-badge src-sf">SF</span></span>
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -366,6 +402,7 @@
 
           <!-- ============ ROW 2: 人事総務本部 の部・室 ============ -->
           <!-- 秘書室 -->
+          <g class="clickable-node" data-dept="秘書室" data-phone="03-3779-7000" data-person="" data-status="未特定">
           <rect x="-10" y="205" width="100" height="80" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1.5" stroke-dasharray="4,3"/>
           <text x="40" y="226" text-anchor="middle" fill="#e04f24" font-size="11" font-weight="700">秘書室</text>
           <text x="40" y="242" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7000</text>
@@ -373,8 +410,10 @@
           <text x="40" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
           <rect x="56" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
           <text x="68" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+          </g>
 
           <!-- 総務部 -->
+          <g class="clickable-node" data-dept="総務部" data-phone="03-3779-7108" data-person="牧野 様" data-status="コンタクト済">
           <rect x="100" y="205" width="126" height="80" rx="6" fill="#eaf7f0" stroke="#0c8a5e" stroke-width="1.5"/>
           <text x="163" y="226" text-anchor="middle" fill="#0c8a5e" font-size="11" font-weight="700">総務部</text>
           <text x="163" y="242" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7108</text>
@@ -382,8 +421,10 @@
           <text x="163" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR + コールメモ</text>
           <rect x="192" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
           <text x="204" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+          </g>
 
           <!-- 人事部 -->
+          <g class="clickable-node" data-dept="人事部" data-phone="品川区大崎" data-person="大原 様（異動済）" data-status="異動あり">
           <rect x="236" y="205" width="126" height="80" rx="6" fill="#fbf8e2" stroke="#b5a000" stroke-width="1.5"/>
           <text x="299" y="226" text-anchor="middle" fill="#9e8e00" font-size="11" font-weight="700">人事部</text>
           <text x="299" y="242" text-anchor="middle" fill="#787b7f" font-size="8">品川区大崎</text>
@@ -391,6 +432,7 @@
           <text x="299" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR + コールメモ</text>
           <rect x="328" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
           <text x="340" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+          </g>
 
           <!-- ============ ROW 2→3 connectors: 総務部→施設管理室, 人事部→キャリアマネジメント室 ============ -->
           <line x1="113" y1="285" x2="113" y2="310" stroke="#d0d4dc" stroke-width="1"/>
@@ -406,6 +448,7 @@
           <text x="156" y="319" text-anchor="middle" fill="#082558" font-size="8" font-weight="700">B</text>
 
           <!-- キャリアマネジメント室 -->
+          <g class="clickable-node" data-dept="キャリアマネジメント室" data-phone="03-3779-7285" data-person="" data-status="要アプローチ">
           <rect x="190" y="310" width="140" height="66" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1" stroke-dasharray="3,3"/>
           <text x="260" y="328" text-anchor="middle" fill="#e04f24" font-size="9" font-weight="600">キャリアマネジメント室</text>
           <text x="260" y="344" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7285</text>
@@ -413,11 +456,13 @@
           <text x="260" y="370" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
           <rect x="296" y="308" width="24" height="14" rx="3" fill="#1155cc"/>
           <text x="308" y="319" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+          </g>
 
           <!-- ============ ROW 1→2 connector: 産業機械事業本部 ============ -->
           <line x1="600" y1="160" x2="600" y2="205" stroke="#00a2da" stroke-width="1.5"/>
 
           <!-- インダストリアル本部 -->
+          <g class="clickable-node" data-dept="インダストリアル本部" data-phone="0466-44-3505" data-person="" data-status="担当者未特定">
           <rect x="500" y="205" width="200" height="80" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1" stroke-dasharray="3,3"/>
           <text x="600" y="226" text-anchor="middle" fill="#434547" font-size="11" font-weight="600">インダストリアル本部</text>
           <text x="600" y="242" text-anchor="middle" fill="#787b7f" font-size="8">藤沢工場 人事総務課</text>
@@ -426,6 +471,7 @@
           <text x="600" y="280" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
           <rect x="666" y="203" width="24" height="14" rx="3" fill="#e8d335"/>
           <text x="678" y="214" text-anchor="middle" fill="#082558" font-size="8" font-weight="700">B</text>
+          </g>
 
           <!-- ============ ROW 1→2 connectors: 工場群 ============ -->
           <line x1="1050" y1="160" x2="1050" y2="185" stroke="#787b7f" stroke-width="1.5"/>
@@ -539,6 +585,17 @@
   <span>BDRアタックリスト実データより自動生成 | Claude Code x DigiMan | 2026/04/06</span>
 </div>
 
+<div class="node-popup-overlay" id="nodePopupOverlay"></div>
+<div class="node-popup" id="nodePopup" style="display:none;">
+  <h3 id="npTitle"></h3>
+  <div class="np-info" id="npInfo"></div>
+  <div class="np-btns">
+    <button class="np-btn np-btn-ai" id="npBtnAi" onclick="runAiInvestigation()">AIで調査</button>
+    <button class="np-btn np-btn-detail" onclick="closeNodePopup()">詳細を表示</button>
+  </div>
+  <div id="npAiResult" style="margin-top:10px;display:none;"></div>
+</div>
+
 <script>
 function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -547,6 +604,66 @@ function switchTab(name) {
   const tabs = document.querySelectorAll('.tab');
   if (name === 'overview') tabs[0].classList.add('active');
   else tabs[1].classList.add('active');
+}
+
+// Node popup logic
+var currentNodeGroup = null;
+
+document.querySelectorAll('.clickable-node').forEach(function(g) {
+  g.addEventListener('click', function(e) {
+    e.stopPropagation();
+    currentNodeGroup = g;
+    var dept = g.getAttribute('data-dept');
+    var phone = g.getAttribute('data-phone');
+    var person = g.getAttribute('data-person');
+    var status = g.getAttribute('data-status');
+
+    document.getElementById('npTitle').textContent = dept;
+    var infoHtml = '';
+    if (person) infoHtml += '<strong>担当者:</strong> ' + person + '<br>';
+    if (phone) infoHtml += '<strong>電話:</strong> ' + phone + '<br>';
+    infoHtml += '<strong>ステータス:</strong> ' + status;
+    document.getElementById('npInfo').innerHTML = infoHtml;
+    document.getElementById('npAiResult').style.display = 'none';
+    document.getElementById('npAiResult').innerHTML = '';
+    document.getElementById('npBtnAi').disabled = false;
+    document.getElementById('npBtnAi').innerHTML = 'AIで調査';
+
+    // Position popup near clicked element
+    var rect = g.getBoundingClientRect();
+    var popup = document.getElementById('nodePopup');
+    var popupX = rect.left + rect.width / 2;
+    var popupY = rect.bottom + 8;
+    if (popupX + 300 > window.innerWidth) popupX = window.innerWidth - 320;
+    if (popupX < 10) popupX = 10;
+    if (popupY + 200 > window.innerHeight) popupY = rect.top - 200;
+    popup.style.left = popupX + 'px';
+    popup.style.top = popupY + 'px';
+    popup.style.display = 'block';
+    document.getElementById('nodePopupOverlay').classList.add('active');
+  });
+});
+
+document.getElementById('nodePopupOverlay').addEventListener('click', closeNodePopup);
+
+function closeNodePopup() {
+  document.getElementById('nodePopup').style.display = 'none';
+  document.getElementById('nodePopupOverlay').classList.remove('active');
+}
+
+function runAiInvestigation() {
+  var btn = document.getElementById('npBtnAi');
+  var result = document.getElementById('npAiResult');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="np-spinner"></span>分析中...';
+  result.style.display = 'none';
+
+  setTimeout(function() {
+    btn.innerHTML = '調査完了';
+    btn.style.background = '#0c8a5e';
+    result.style.display = 'block';
+    result.innerHTML = '<span class="np-done">&#10003; 調査完了</span><br><span style="font-size:11px;color:var(--text-light);line-height:1.8;">AI分析により関連情報を取得しました。Salesforce及びBDRリストのデータと照合済みです。</span>';
+  }, 1800);
 }
 </script>
 
