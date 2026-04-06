@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>組織図営業ダッシュボード — デモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-blue: #1155cc;
+    --cyan: #00a2da;
+    --yellow: #e8d335;
+    --red: #e04f24;
+    --blue-50: #e7eefb;
+    --blue-100: #c2d6f9;
+    --blue-200: #86aaec;
+    --blue-400: #1155cc;
+    --blue-500: #0c3d93;
+    --blue-600: #082558;
+    --cyan-50: #eff8fa;
+    --cyan-100: #a1d7ea;
+    --cyan-300: #00a2da;
+    --yellow-50: #fbf8e2;
+    --yellow-100: #f4edb6;
+    --yellow-300: #e8d335;
+    --red-50: #ffeae4;
+    --red-100: #fecec0;
+    --red-400: #e04f24;
+    --gray-50: #fafaff;
+    --gray-100: #f9f9fc;
+    --gray-200: #e4e8ef;
+    --gray-300: #d0d4dc;
+    --gray-500: #787b7f;
+    --gray-600: #434547;
+    --text-dark: #434547;
+    --text-light: #787b7f;
+    --text-muted: #688dce;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Sans JP', 'Poppins', sans-serif; background: var(--gray-100); color: var(--text-dark); line-height: 1.8; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-500) 100%);
+    padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+    color: #fff;
+  }
+  .header h1 { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; }
+  .header .subtitle { color: var(--blue-100); font-size: 13px; margin-top: 2px; }
+  .claude-badge {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 0; padding: 0 40px; background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .tab {
+    padding: 14px 28px; font-size: 14px; font-weight: 600; cursor: pointer;
+    color: var(--text-light); border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text-dark); }
+  .tab.active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Layout */
+  .page { padding: 24px 40px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: 12px;
+    padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);
+    padding-left: 12px; border-left: 3px solid var(--primary-blue);
+  }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-item {
+    text-align: center; padding: 20px 16px; border-radius: 10px;
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+  }
+  .stat-number { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--text-light); margin-top: 6px; }
+  .c-green { color: #0c8a5e; }
+  .c-yellow { color: #b5a000; }
+  .c-red { color: var(--red); }
+  .c-blue { color: var(--primary-blue); }
+  .progress-bar { height: 6px; background: var(--gray-200); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+
+  /* Heatmap */
+  .heatmap-table { width: 100%; border-collapse: separate; border-spacing: 3px; }
+  .heatmap-table th { font-size: 11px; color: var(--text-light); font-weight: 600; padding: 8px 6px; text-align: center; }
+  .heatmap-table th:first-child { text-align: left; }
+  .heatmap-table td { padding: 10px; border-radius: 6px; font-size: 12px; text-align: center; font-weight: 600; }
+  .h-g { background: #d4f5e6; color: #0c8a5e; }
+  .h-y { background: var(--yellow-50); color: #9e8e00; }
+  .h-r { background: var(--red-50); color: var(--red); }
+  .h-x { background: var(--gray-50); color: var(--gray-300); }
+  .h-co { text-align: left !important; font-weight: 700; color: var(--text-dark); }
+  .legend { margin-top: 12px; display: flex; gap: 20px; font-size: 11px; color: var(--text-light); }
+
+  /* Before/After */
+  .ba-grid { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; }
+  .ba-arrow { text-align: center; font-size: 28px; color: var(--primary-blue); }
+  .ba-box { padding: 20px; border-radius: 10px; font-size: 13px; line-height: 2; }
+  .ba-before { background: var(--red-50); border: 1px solid var(--red-100); }
+  .ba-after { background: var(--blue-50); border: 1px solid var(--blue-100); }
+  .ba-label { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+
+  /* Mindmap */
+  .mindmap-container { width: 100%; overflow-x: auto; padding: 8px 0; }
+  .mindmap-svg text { font-family: 'Noto Sans JP', 'Poppins', sans-serif; }
+
+  /* Company Banner */
+  .company-banner {
+    background: linear-gradient(135deg, var(--blue-50) 0%, #fff 100%);
+    border: 1px solid var(--blue-100); border-radius: 12px;
+    padding: 24px 28px; margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  .co-name { font-size: 22px; font-weight: 700; color: var(--blue-600); }
+  .co-meta { display: flex; gap: 20px; margin-top: 6px; font-size: 13px; color: var(--text-light); }
+  .co-meta .v { color: var(--text-dark); font-weight: 600; }
+  .badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .b-green { background: #d4f5e6; color: #0c8a5e; }
+  .b-yellow { background: var(--yellow-50); color: #9e8e00; border: 1px solid var(--yellow-100); }
+  .b-red { background: var(--red-50); color: var(--red); }
+
+  /* Timeline */
+  .tl { position: relative; padding-left: 24px; }
+  .tl::before { content:''; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background: var(--gray-200); }
+  .tl-item { position: relative; padding: 6px 0 18px 16px; }
+  .tl-item::before {
+    content:''; position: absolute; left: -20px; top: 10px;
+    width: 10px; height: 10px; border-radius: 50%; border: 2px solid;
+  }
+  .tl-done::before { border-color: #0c8a5e; background: #d4f5e6; }
+  .tl-pend::before { border-color: var(--yellow); background: var(--yellow-50); }
+  .tl-date { font-size: 11px; color: var(--text-light); }
+  .tl-text { font-size: 13px; margin-top: 2px; }
+
+  /* Actions */
+  .act-list { list-style: none; }
+  .act-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-200); }
+  .act-item:last-child { border-bottom: none; }
+  .act-num {
+    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700;
+  }
+  .act-hi { background: var(--red-50); color: var(--red); }
+  .act-md { background: var(--yellow-50); color: #9e8e00; }
+  .act-title { font-size: 13px; font-weight: 600; }
+  .act-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  /* AI comment */
+  .ai-box {
+    padding: 14px; border-radius: 8px; margin-top: 16px;
+    background: var(--blue-50); border: 1px solid var(--blue-100);
+  }
+  .ai-label { font-size: 12px; font-weight: 700; color: var(--primary-blue); margin-bottom: 6px; }
+  .ai-text { font-size: 12px; line-height: 1.8; color: var(--text-dark); }
+
+  .footer {
+    padding: 16px 40px; display: flex; justify-content: space-between;
+    color: var(--text-light); font-size: 11px; border-top: 1px solid var(--gray-200); background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Organization Sales Dashboard</h1>
+    <div class="subtitle">BDRアタックリスト x Salesforce x AI — 組織図営業ダッシュボード</div>
+  </div>
+  <div class="claude-badge">Claude Code で自動生成</div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('overview')">全体俯瞰</div>
+  <div class="tab" onclick="switchTab('detail')">企業詳細: 日本精工</div>
+</div>
+
+<!-- ===================== TAB 1: 全体俯瞰 ===================== -->
+<div id="tab-overview" class="tab-content active">
+  <div class="page">
+
+    <div class="card">
+      <h2>カバレッジサマリ — 全186社</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number c-green">16</div>
+          <div class="stat-label">確認済み（緑） 9%</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:9%;background:#0c8a5e;"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number c-yellow">118</div>
+          <div class="stat-label">鮮度不明（黄） 63%</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:63%;background:var(--yellow);"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number c-red">52</div>
+          <div class="stat-label">未特定（赤） 28%</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:28%;background:var(--red);"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number c-blue">186</div>
+          <div class="stat-label">対象企業 合計</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--primary-blue);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>アプローチ状況ヒートマップ — Tier1企業（抜粋）</h2>
+      <div style="overflow-x:auto;">
+        <table class="heatmap-table">
+          <thead><tr>
+            <th style="width:180px;">企業名</th><th>秘書室</th><th>人事本部</th><th>人事部</th><th>総務部</th><th>経営企画</th><th>人材開発</th><th>ステータス</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="h-co">シスメックス</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-green">確認済</span></td></tr>
+            <tr><td class="h-co">豊田自動織機</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-green">確認済</span></td></tr>
+            <tr><td class="h-co">川崎重工業</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-green">確認済</span></td></tr>
+            <tr><td class="h-co">アイシン</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-green">確認済</span></td></tr>
+            <tr><td class="h-co">日本精工</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-y">一部</td><td class="h-g">済</td><td class="h-x">—</td><td class="h-r">未</td><td><span class="badge b-yellow">鮮度不明</span></td></tr>
+            <tr><td class="h-co">三菱ふそう</td><td class="h-x">—</td><td class="h-y">一部</td><td class="h-y">一部</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-yellow">鮮度不明</span></td></tr>
+            <tr><td class="h-co">トヨタ自動車</td><td class="h-y">一部</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-x">—</td><td class="h-x">—</td><td class="h-x">—</td><td><span class="badge b-red">未特定</span></td></tr>
+            <tr><td class="h-co">村田製作所</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-r">未</td><td class="h-r">未</td><td><span class="badge b-red">未特定</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span><span style="color:#0c8a5e;">&#9632;</span> コンタクト済</span>
+        <span><span style="color:var(--yellow);">&#9632;</span> 一部接触</span>
+        <span><span style="color:var(--red);">&#9632;</span> 未接触</span>
+        <span><span style="color:var(--gray-300);">&#9632;</span> 部署未確認</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Before / After</h2>
+      <div class="ba-grid">
+        <div class="ba-box ba-before">
+          <div class="ba-label" style="color:var(--red);">BEFORE</div>
+          部署情報がスプシの1セルに自由テキスト<br>
+          誰がどの部署にいるか把握しにくい<br>
+          「抜け」は目視で確認<br>
+          アプローチ状況は担当者の頭の中<br>
+          186社の全体感が見えない
+        </div>
+        <div class="ba-arrow">&#10132;</div>
+        <div class="ba-box ba-after">
+          <div class="ba-label" style="color:var(--primary-blue);">AFTER</div>
+          部署構造がマインドマップで自動可視化<br>
+          「誰に会えて / 会えていないか」が一目瞭然<br>
+          AIが「抜け」を自動検出しアクション提案<br>
+          ヒートマップで186社を俯瞰<br>
+          <strong style="color:var(--primary-blue);">「組織図見せて」→ 即回答</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== TAB 2: 企業詳細 ===================== -->
+<div id="tab-detail" class="tab-content">
+  <div class="page">
+
+    <div class="company-banner">
+      <div>
+        <div class="co-name">日本精工株式会社（NSK）</div>
+        <div class="co-meta">
+          <span>Tier: <span class="v">Tier1</span></span>
+          <span>AE: <span class="v">酒井 皓矢</span></span>
+          <span>BDR: <span class="v">増谷</span></span>
+          <span>コンタクト: <span class="v">10名</span></span>
+          <span>所在地: <span class="v">東京都品川区</span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="badge b-yellow">鮮度不明</span>
+        <span class="badge b-green">アポ獲得済</span>
+        <span class="badge b-green">部署番号取得済</span>
+      </div>
+    </div>
+
+    <!-- Mindmap Org Chart -->
+    <div class="card">
+      <h2>人事組織図マップ</h2>
+      <div style="display:flex;gap:20px;margin-bottom:8px;font-size:11px;color:var(--text-light);flex-wrap:wrap;align-items:center;">
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0c8a5e;vertical-align:middle;margin-right:4px;"></span>コンタクト済</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:4px;"></span>未特定 / 未接触</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--yellow);vertical-align:middle;margin-right:4px;"></span>異動あり</span>
+        <span style="margin-left:12px;">確度:
+          <span style="background:var(--primary-blue);color:#fff;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">A 確認済</span>
+          <span style="background:var(--yellow);color:var(--blue-600);padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">B 推定</span>
+          <span style="background:var(--gray-300);color:#fff;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">C 未検証</span>
+        </span>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:16px;padding:10px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-200);">
+        データ出典: BDRリスト「部署情報」列のテキストをパースして構造化（9エントリ, 重複除去後8件）。実際の部署数はこれ以上存在する可能性あり。SF・外部データ連携で補完が必要。
+      </div>
+      <div class="mindmap-container">
+        <svg class="mindmap-svg" viewBox="0 0 1200 720" width="100%" height="720">
+          <defs>
+            <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1155cc" flood-opacity="0.1"/>
+            </filter>
+          </defs>
+
+          <!-- ============ ROW 0: 会社名 ============ -->
+          <rect x="430" y="10" width="340" height="56" rx="6" fill="#082558" filter="url(#shadow)"/>
+          <text x="600" y="35" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">日本精工株式会社</text>
+          <text x="600" y="54" text-anchor="middle" fill="#a1d7ea" font-size="10">品川区大崎 | Tier1 | BDR: 増谷 | AE: 酒井</text>
+
+          <!-- 会社→3本部 の縦線 -->
+          <line x1="600" y1="66" x2="600" y2="90" stroke="#1155cc" stroke-width="2"/>
+          <!-- 横線 -->
+          <line x1="150" y1="90" x2="1050" y2="90" stroke="#1155cc" stroke-width="2"/>
+          <!-- 3本の下向き線 -->
+          <line x1="150" y1="90" x2="150" y2="110" stroke="#1155cc" stroke-width="2"/>
+          <line x1="600" y1="90" x2="600" y2="110" stroke="#1155cc" stroke-width="2"/>
+          <line x1="1050" y1="90" x2="1050" y2="110" stroke="#1155cc" stroke-width="2"/>
+
+          <!-- ============ ROW 1: 3本部 ============ -->
+          <!-- 人事総務本部 -->
+          <rect x="40" y="110" width="220" height="50" rx="6" fill="#1155cc" filter="url(#shadow)"/>
+          <text x="150" y="133" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">人事総務本部</text>
+          <text x="150" y="150" text-anchor="middle" fill="#c2d6f9" font-size="9">本社機能</text>
+          <rect x="226" y="108" width="24" height="14" rx="3" fill="#0c3d93"/>
+          <text x="238" y="119" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+
+          <!-- 産業機械事業本部 -->
+          <rect x="475" y="110" width="250" height="50" rx="6" fill="#00a2da" filter="url(#shadow)"/>
+          <text x="600" y="133" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">産業機械事業本部</text>
+          <text x="600" y="150" text-anchor="middle" fill="#eff8fa" font-size="9">事業部門</text>
+          <rect x="691" y="108" width="24" height="14" rx="3" fill="#e8d335"/>
+          <text x="703" y="119" text-anchor="middle" fill="#082558" font-size="8" font-weight="700">B</text>
+
+          <!-- 工場群 -->
+          <rect x="920" y="110" width="260" height="50" rx="6" fill="#787b7f" filter="url(#shadow)"/>
+          <text x="1050" y="133" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">工場群（拠点人事）</text>
+          <text x="1050" y="150" text-anchor="middle" fill="#e4e8ef" font-size="9">各拠点の人事総務課</text>
+          <rect x="1146" y="108" width="24" height="14" rx="3" fill="#d0d4dc"/>
+          <text x="1158" y="119" text-anchor="middle" fill="#434547" font-size="8" font-weight="700">C</text>
+
+          <!-- ============ ROW 1→2 connectors: 人事総務本部 ============ -->
+          <line x1="150" y1="160" x2="150" y2="185" stroke="#1155cc" stroke-width="1.5"/>
+          <line x1="40" y1="185" x2="260" y2="185" stroke="#1155cc" stroke-width="1.5"/>
+          <line x1="40" y1="185" x2="40" y2="205" stroke="#1155cc" stroke-width="1.5"/>
+          <line x1="113" y1="185" x2="113" y2="205" stroke="#1155cc" stroke-width="1.5"/>
+          <line x1="187" y1="185" x2="187" y2="205" stroke="#1155cc" stroke-width="1.5"/>
+          <line x1="260" y1="185" x2="260" y2="205" stroke="#1155cc" stroke-width="1.5"/>
+
+          <!-- ============ ROW 2: 人事総務本部 の部・室 ============ -->
+          <!-- 秘書室 -->
+          <rect x="-10" y="205" width="100" height="80" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="40" y="226" text-anchor="middle" fill="#e04f24" font-size="11" font-weight="700">秘書室</text>
+          <text x="40" y="242" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7000</text>
+          <text x="40" y="256" text-anchor="middle" fill="#e04f24" font-size="8">? 未特定</text>
+          <text x="40" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
+          <rect x="56" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
+          <text x="68" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+
+          <!-- 総務部 -->
+          <rect x="100" y="205" width="126" height="80" rx="6" fill="#eaf7f0" stroke="#0c8a5e" stroke-width="1.5"/>
+          <text x="163" y="226" text-anchor="middle" fill="#0c8a5e" font-size="11" font-weight="700">総務部</text>
+          <text x="163" y="242" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7108</text>
+          <text x="163" y="256" text-anchor="middle" fill="#0c8a5e" font-size="8">牧野 様</text>
+          <text x="163" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR + コールメモ</text>
+          <rect x="192" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
+          <text x="204" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+
+          <!-- 人事部 -->
+          <rect x="236" y="205" width="126" height="80" rx="6" fill="#fbf8e2" stroke="#b5a000" stroke-width="1.5"/>
+          <text x="299" y="226" text-anchor="middle" fill="#9e8e00" font-size="11" font-weight="700">人事部</text>
+          <text x="299" y="242" text-anchor="middle" fill="#787b7f" font-size="8">品川区大崎</text>
+          <text x="299" y="256" text-anchor="middle" fill="#9e8e00" font-size="8">大原 様（異動済）</text>
+          <text x="299" y="276" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR + コールメモ</text>
+          <rect x="328" y="203" width="24" height="14" rx="3" fill="#1155cc"/>
+          <text x="340" y="214" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+
+          <!-- ============ ROW 2→3 connectors: 総務部→施設管理室, 人事部→キャリアマネジメント室 ============ -->
+          <line x1="113" y1="285" x2="113" y2="310" stroke="#d0d4dc" stroke-width="1"/>
+          <line x1="260" y1="285" x2="260" y2="310" stroke="#d0d4dc" stroke-width="1"/>
+
+          <!-- ============ ROW 3: 室 ============ -->
+          <!-- 施設管理室 -->
+          <rect x="48" y="310" width="130" height="66" rx="6" fill="#fafaff" stroke="#d0d4dc" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="113" y="332" text-anchor="middle" fill="#434547" font-size="10">施設管理室</text>
+          <text x="113" y="348" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7127</text>
+          <text x="113" y="366" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
+          <rect x="144" y="308" width="24" height="14" rx="3" fill="#e8d335"/>
+          <text x="156" y="319" text-anchor="middle" fill="#082558" font-size="8" font-weight="700">B</text>
+
+          <!-- キャリアマネジメント室 -->
+          <rect x="190" y="310" width="140" height="66" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="260" y="328" text-anchor="middle" fill="#e04f24" font-size="9" font-weight="600">キャリアマネジメント室</text>
+          <text x="260" y="344" text-anchor="middle" fill="#787b7f" font-size="8">03-3779-7285</text>
+          <text x="260" y="358" text-anchor="middle" fill="#e04f24" font-size="8">? 要アプローチ</text>
+          <text x="260" y="370" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
+          <rect x="296" y="308" width="24" height="14" rx="3" fill="#1155cc"/>
+          <text x="308" y="319" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">A</text>
+
+          <!-- ============ ROW 1→2 connector: 産業機械事業本部 ============ -->
+          <line x1="600" y1="160" x2="600" y2="205" stroke="#00a2da" stroke-width="1.5"/>
+
+          <!-- インダストリアル本部 -->
+          <rect x="500" y="205" width="200" height="80" rx="6" fill="#ffeae4" stroke="#e04f24" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="600" y="226" text-anchor="middle" fill="#434547" font-size="11" font-weight="600">インダストリアル本部</text>
+          <text x="600" y="242" text-anchor="middle" fill="#787b7f" font-size="8">藤沢工場 人事総務課</text>
+          <text x="600" y="256" text-anchor="middle" fill="#787b7f" font-size="8">0466-44-3505</text>
+          <text x="600" y="270" text-anchor="middle" fill="#e04f24" font-size="8">? 担当者未特定</text>
+          <text x="600" y="280" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR部署情報</text>
+          <rect x="666" y="203" width="24" height="14" rx="3" fill="#e8d335"/>
+          <text x="678" y="214" text-anchor="middle" fill="#082558" font-size="8" font-weight="700">B</text>
+
+          <!-- ============ ROW 1→2 connectors: 工場群 ============ -->
+          <line x1="1050" y1="160" x2="1050" y2="185" stroke="#787b7f" stroke-width="1.5"/>
+          <line x1="870" y1="185" x2="1180" y2="185" stroke="#787b7f" stroke-width="1"/>
+          <line x1="870" y1="185" x2="870" y2="205" stroke="#787b7f" stroke-width="1"/>
+          <line x1="973" y1="185" x2="973" y2="205" stroke="#787b7f" stroke-width="1"/>
+          <line x1="1077" y1="185" x2="1077" y2="205" stroke="#787b7f" stroke-width="1"/>
+          <line x1="1180" y1="185" x2="1180" y2="205" stroke="#787b7f" stroke-width="1"/>
+
+          <!-- 藤沢工場 -->
+          <rect x="815" y="205" width="110" height="60" rx="6" fill="#fafaff" stroke="#e4e8ef" stroke-width="1"/>
+          <text x="870" y="228" text-anchor="middle" fill="#434547" font-size="10">藤沢工場</text>
+          <text x="870" y="244" text-anchor="middle" fill="#787b7f" font-size="8">0466-43-3800</text>
+          <text x="870" y="258" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR</text>
+
+          <!-- 福島工場 -->
+          <rect x="918" y="205" width="110" height="60" rx="6" fill="#fafaff" stroke="#e4e8ef" stroke-width="1"/>
+          <text x="973" y="228" text-anchor="middle" fill="#434547" font-size="10">福島工場</text>
+          <text x="973" y="244" text-anchor="middle" fill="#787b7f" font-size="8">0247-33-3210</text>
+          <text x="973" y="258" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR</text>
+
+          <!-- 石部工場 -->
+          <rect x="1022" y="205" width="110" height="60" rx="6" fill="#fafaff" stroke="#e4e8ef" stroke-width="1"/>
+          <text x="1077" y="228" text-anchor="middle" fill="#434547" font-size="10">石部工場</text>
+          <text x="1077" y="244" text-anchor="middle" fill="#787b7f" font-size="8">0748-77-3161</text>
+          <text x="1077" y="258" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR</text>
+
+          <!-- 埼玉工場 -->
+          <rect x="1125" y="205" width="110" height="60" rx="6" fill="#fafaff" stroke="#e4e8ef" stroke-width="1"/>
+          <text x="1180" y="228" text-anchor="middle" fill="#434547" font-size="10">埼玉工場</text>
+          <text x="1180" y="244" text-anchor="middle" fill="#787b7f" font-size="8">048-565-1111</text>
+          <text x="1180" y="258" text-anchor="middle" fill="#688dce" font-size="7">出典: BDR</text>
+
+          <!-- ============ Summary & Legend (bottom) ============ -->
+          <rect x="30" y="420" width="540" height="52" rx="8" fill="#e7eefb" stroke="#c2d6f9" stroke-width="1"/>
+          <text x="300" y="443" text-anchor="middle" fill="#1155cc" font-size="13" font-weight="700">BDRリスト記載分: 8部署 | コンタクト済: 2部署 (25%)</text>
+          <text x="300" y="462" text-anchor="middle" fill="#787b7f" font-size="10">* 実際の組織構造はこれ以上の部署が存在する可能性あり（SF・外部データで補完予定）</text>
+
+          <rect x="600" y="420" width="580" height="52" rx="8" fill="#fafaff" stroke="#e4e8ef" stroke-width="1"/>
+          <text x="620" y="440" fill="#434547" font-size="10" font-weight="600">確度レベル</text>
+          <rect x="700" y="432" width="18" height="12" rx="3" fill="#1155cc"/>
+          <text x="724" y="442" fill="#787b7f" font-size="9">A 確認済（コールメモで裏付け）</text>
+          <rect x="890" y="432" width="18" height="12" rx="3" fill="#e8d335"/>
+          <text x="914" y="442" fill="#787b7f" font-size="9">B 推定（テキストから推定）</text>
+          <rect x="1060" y="432" width="18" height="12" rx="3" fill="#d0d4dc"/>
+          <text x="1084" y="442" fill="#787b7f" font-size="9">C 未検証</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 2-column detail cards -->
+    <div class="grid-2">
+
+      <div class="card">
+        <h2>アプローチ状況</h2>
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>部署カバレッジ</span><span style="color:var(--primary-blue);font-weight:700;">25%</span>
+          </div>
+          <div class="progress-bar" style="height:10px;"><div class="progress-fill" style="width:25%;background:linear-gradient(90deg,#0c8a5e,var(--cyan));"></div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text-light);margin-bottom:10px;">コンタクト履歴</div>
+        <div class="tl">
+          <div class="tl-item tl-done"><div class="tl-date">12/25</div><div class="tl-text">ひこまえ様 → 直留守</div></div>
+          <div class="tl-item tl-done"><div class="tl-date">12/25</div><div class="tl-text">大原様 → 部署異動判明（給与構成室へ）</div></div>
+          <div class="tl-item tl-done"><div class="tl-date">12/25</div><div class="tl-text">牧野様 → コンタクト成功</div></div>
+          <div class="tl-item tl-done"><div class="tl-date">12/25</div><div class="tl-text">牧野様 呼び出し → 1月28,29はNG</div></div>
+          <div class="tl-item tl-pend"><div class="tl-date">1月第2週</div><div class="tl-text">牧野様 再架電予定</div></div>
+        </div>
+        <div class="ai-box">
+          <div class="ai-label">AI 分析</div>
+          <div class="ai-text">
+            BDRリスト記載の8部署中、コンタクト済は2部署のみ。<strong style="color:var(--primary-blue);">秘書室のキーパーソン未特定</strong>が「鮮度不明」ステータスの主因。キャリアマネジメント室は人材開発の意思決定者がいる可能性が高く、優先アプローチ推奨。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>推奨ネクストアクション</h2>
+        <ul class="act-list">
+          <li class="act-item">
+            <div class="act-num act-hi">1</div>
+            <div><div class="act-title">秘書室のキーパーソンを特定</div><div class="act-desc">03-3779-7000 に架電。人事総務本部長 or 人事部長の氏名確認</div></div>
+          </li>
+          <li class="act-item">
+            <div class="act-num act-hi">2</div>
+            <div><div class="act-title">キャリアマネジメント室にアプローチ</div><div class="act-desc">03-3779-7285 に架電。タレントマネジメント意思決定者</div></div>
+          </li>
+          <li class="act-item">
+            <div class="act-num act-md">3</div>
+            <div><div class="act-title">牧野様への再架電（総務部）</div><div class="act-desc">1月第2週予定。人事部門へのリファラル獲得が目標</div></div>
+          </li>
+          <li class="act-item">
+            <div class="act-num act-md">4</div>
+            <div><div class="act-title">大原様の異動先で新担当確認</div><div class="act-desc">給与構成室へ異動。元の人事部の後任者を確認</div></div>
+          </li>
+          <li class="act-item">
+            <div class="act-num act-md">5</div>
+            <div><div class="act-title">工場拠点は後回し</div><div class="act-desc">本社の意思決定ラインを先に押さえる</div></div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>&copy; DigiMan Inc.</span>
+  <span>BDRアタックリスト実データより自動生成 | Claude Code x DigiMan | 2026/04/06</span>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const tabs = document.querySelectorAll('.tab');
+  if (name === 'overview') tabs[0].classList.add('active');
+  else tabs[1].classList.add('active');
+}
+</script>
+
+</body>
+</html>
