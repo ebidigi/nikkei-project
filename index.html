@@ -222,6 +222,27 @@
   .ai-label { font-size: 12px; font-weight: 700; color: var(--primary-blue); margin-bottom: 6px; }
   .ai-text { font-size: 12px; line-height: 1.8; color: var(--text-dark); }
 
+  /* SF Table */
+  .sf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .sf-table th {
+    text-align: left; padding: 10px 8px; font-size: 11px; font-weight: 600;
+    color: var(--text-light); border-bottom: 2px solid var(--gray-200); background: var(--gray-50);
+  }
+  .sf-table td { padding: 10px 8px; border-bottom: 1px solid var(--gray-200); }
+  .sf-table tr:hover { background: var(--blue-50); }
+  .sf-name { font-weight: 600; color: var(--text-dark); }
+  .sf-dept-ok { color: #0c8a5e; }
+  .sf-dept-ng { color: var(--gray-300); }
+  .sf-phone { font-family: 'Poppins', monospace; font-size: 11px; color: var(--text-light); }
+  .sf-email { font-size: 11px; color: var(--text-muted); }
+  .sf-status {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    font-size: 10px; font-weight: 600;
+  }
+  .sf-st-ok { background: #d4f5e6; color: #0c8a5e; }
+  .sf-st-ng { background: var(--gray-50); color: var(--gray-500); border: 1px solid var(--gray-200); }
+  .sf-st-err { background: var(--red-50); color: var(--red); border: 1px solid var(--red-100); }
+
   .footer {
     padding: 16px 40px; display: flex; justify-content: space-between;
     color: var(--text-light); font-size: 11px; border-top: 1px solid var(--gray-200); background: #fff;
@@ -241,6 +262,7 @@
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('overview')">全体俯瞰</div>
   <div class="tab" onclick="switchTab('detail')">企業詳細: 日本精工</div>
+  <div class="tab" onclick="switchTab('sf')">SF取引先責任者</div>
 </div>
 
 <!-- ===================== TAB 1: 全体俯瞰 ===================== -->
@@ -580,6 +602,266 @@
   </div>
 </div>
 
+<!-- ===================== TAB 3: SF取引先責任者 ===================== -->
+<div id="tab-sf" class="tab-content">
+  <div class="page">
+
+    <div class="company-banner">
+      <div>
+        <div class="co-name">日本精工株式会社（NSK）— Salesforce 取引先責任者</div>
+        <div class="co-meta">
+          <span>取引先責任者: <span class="v">18名</span></span>
+          <span>部署情報あり: <span class="v" style="color:#0c8a5e;">3名</span></span>
+          <span>部署なし: <span class="v" style="color:var(--red);">15名</span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="badge" style="background:var(--blue-50);color:var(--primary-blue);border:1px solid var(--blue-100);">Salesforce データ</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>SF取引先責任者一覧 — 日本精工株式会社</h2>
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:12px;padding:10px 14px;background:var(--yellow-50);border-radius:8px;border:1px solid var(--yellow-100);">
+        <strong style="color:#9e8e00;">注意:</strong> 18名中15名の部署情報が未入力。名寄せ・部署紐付けが必要。「HR」「人事」「人事部」など表記揺れの整理も課題。
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th style="width:30px;">#</th>
+              <th>姓</th>
+              <th>名</th>
+              <th>部署</th>
+              <th>役職</th>
+              <th>電話</th>
+              <th>メール</th>
+              <th>ステータス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td class="sf-name">石井</td><td>昭徳</td>
+              <td class="sf-dept-ok">経営企画本部 SCM企画部</td>
+              <td>-</td>
+              <td class="sf-phone">03-3779-7298</td>
+              <td class="sf-email">ishii-a@nsk.com</td>
+              <td><span class="sf-status sf-st-ok">部署あり</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td class="sf-name">堀井</td><td>俊秀</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">08059084073</td>
+              <td class="sf-email">horii@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td class="sf-name">中元</td><td>和正</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">03-3779-7487</td>
+              <td class="sf-email">nakamoto-k@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td class="sf-name">岡</td><td>秀典</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">0337797095</td>
+              <td class="sf-email">oka-h@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td class="sf-name">酒井</td><td>克充</td>
+              <td class="sf-dept-ng">-</td>
+              <td>一般社員</td>
+              <td class="sf-phone">0466-21-3171</td>
+              <td class="sf-email">sakai-ka@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td class="sf-name">山崎</td><td>雅彦</td>
+              <td class="sf-dept-ok">知的財産部</td>
+              <td>-</td>
+              <td class="sf-phone">0466213264</td>
+              <td class="sf-email">yamazaki-ma@nsk.com</td>
+              <td><span class="sf-status sf-st-ok">部署あり</span></td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td class="sf-name">岩根</td><td>良憲</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">070-3815-4363</td>
+              <td class="sf-email">iwane@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr style="background:#eaf7f0;">
+              <td>8</td>
+              <td class="sf-name" style="font-weight:700;">牧野</td><td>直行</td>
+              <td class="sf-dept-ok" style="font-weight:700;">人事部</td>
+              <td>課長クラス</td>
+              <td class="sf-phone">090-1295-0981</td>
+              <td class="sf-email">makino-n@nsk.com</td>
+              <td><span class="sf-status sf-st-ok">部署あり</span></td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td class="sf-name">島田</td><td>壮宏</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">080-4431-6097</td>
+              <td class="sf-email">shimada-t@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td class="sf-name">彦前</td><td>伸一</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">07039813164</td>
+              <td class="sf-email">hikomae@gmail.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td class="sf-name">小池</td><td>徹也</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">07074659663</td>
+              <td class="sf-email">koike@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td class="sf-name">小池</td><td>秀生</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">07075143329</td>
+              <td class="sf-email">koike-h@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td class="sf-name">大原</td><td>規彰</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">07038154366</td>
+              <td class="sf-email">oohara@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td class="sf-name">谷川</td><td>和也</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">070-3815-4585</td>
+              <td class="sf-email">tanikawa-k@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td class="sf-name">小林</td><td>茂晴</td>
+              <td class="sf-dept-ng">-</td>
+              <td>一般社員</td>
+              <td class="sf-phone">080-6752-9683</td>
+              <td class="sf-email">kobayashi-shi@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr>
+              <td>16</td>
+              <td class="sf-name" style="color:var(--red);">【要変更】NPAご担当者様</td><td>-</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">03-3779-7111</td>
+              <td class="sf-email">-</td>
+              <td><span class="sf-status sf-st-err">要修正</span></td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td class="sf-name">小室</td><td>亘</td>
+              <td class="sf-dept-ng">-</td>
+              <td>-</td>
+              <td class="sf-phone">080-5984-7678</td>
+              <td class="sf-email">komuro-w@nsk.com</td>
+              <td><span class="sf-status sf-st-ng">部署なし</span></td>
+            </tr>
+            <tr style="background:#eaf7f0;">
+              <td>18</td>
+              <td class="sf-name" style="font-weight:700;">磯前</td><td>又香</td>
+              <td class="sf-dept-ok" style="font-weight:700;">人事部</td>
+              <td>主任／係長クラス</td>
+              <td class="sf-phone">070-2266-0166</td>
+              <td class="sf-email">isomae-y-1158@nsk.com</td>
+              <td><span class="sf-status sf-st-ok">部署あり</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>データ品質サマリ</h2>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-item">
+            <div class="stat-number c-blue">18</div>
+            <div class="stat-label">取引先責任者 合計</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number c-green">3</div>
+            <div class="stat-label">部署情報あり (17%)</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:17%;background:#0c8a5e;"></div></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number c-red">15</div>
+            <div class="stat-label">部署情報なし (83%)</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:83%;background:var(--red);"></div></div>
+          </div>
+        </div>
+        <div class="ai-box" style="margin-top:16px;">
+          <div class="ai-label">AI 分析 — データ品質</div>
+          <div class="ai-text">
+            18名中<strong style="color:var(--red);">83%が部署未入力</strong>。組織図マップとの突合には、BDRリスト・外部調査データとの名寄せが必要。また「【要変更】NPAご担当者様」など<strong>データクレンジング対象</strong>が存在。人事部に紐づく牧野様・磯前様はBDRリストのコンタクト履歴とも一致しており信頼度が高い。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>名寄せ課題</h2>
+        <div style="font-size:13px;line-height:2;">
+          <div style="padding:8px 12px;background:var(--red-50);border-radius:6px;margin-bottom:8px;">
+            <strong style="color:var(--red);">表記揺れの例</strong><br>
+            SF: 「人事部」「経営企画本部 SCM企画部」「知的財産部」<br>
+            BDR: 「人事総務本部」「人事部」「総務部」「キャリアマネジメント室」<br>
+            → <strong>同じ部署でも表記が異なる可能性</strong>
+          </div>
+          <div style="padding:8px 12px;background:var(--yellow-50);border-radius:6px;margin-bottom:8px;">
+            <strong style="color:#9e8e00;">判断基準が必要な例</strong><br>
+            「HR」=「人事」=「人事部」？<br>
+            「人事総務本部」の下に「人事部」がある場合は？<br>
+            → <strong>日経側で判断ルールを決める必要あり</strong>
+          </div>
+          <div style="padding:8px 12px;background:var(--blue-50);border-radius:6px;">
+            <strong style="color:var(--primary-blue);">対応案</strong><br>
+            1. 日経側で部署マスタを定義<br>
+            2. DigiManがAIで仮マッピング → 日経が確認<br>
+            3. 確認済みルールで以降は自動適用
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div class="footer">
   <span>&copy; DigiMan Inc.</span>
   <span>BDRアタックリスト実データより自動生成 | Claude Code x DigiMan | 2026/04/06</span>
@@ -603,7 +885,8 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
   const tabs = document.querySelectorAll('.tab');
   if (name === 'overview') tabs[0].classList.add('active');
-  else tabs[1].classList.add('active');
+  else if (name === 'detail') tabs[1].classList.add('active');
+  else if (name === 'sf') tabs[2].classList.add('active');
 }
 
 // Node popup logic
